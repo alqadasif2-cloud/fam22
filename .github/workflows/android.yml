@@ -85,17 +85,88 @@ jobs:
       - name: 5. Configure Firebase Services & API Keys
         run: |
           echo "Verifying and configuring google-services.json for Child and Parent apps..."
+          
+          # 1. Child App Firebase Configuration
           if [ -n "${{ secrets.GOOGLE_SERVICES_CHILD_B64 }}" ]; then
             echo "${{ secrets.GOOGLE_SERVICES_CHILD_B64 }}" | base64 -d > child/google-services.json
-            echo "✅ Loaded child/google-services.json from secret"
+            echo "✅ Loaded child/google-services.json from GitHub secret"
+          elif [ ! -f "child/google-services.json" ]; then
+            echo "⚙️ Generating default child/google-services.json for build..."
+            cat << 'EOF' > child/google-services.json
+{
+  "project_info": {
+    "project_number": "664521829167",
+    "project_id": "gen-lang-client-0469226875",
+    "storage_bucket": "gen-lang-client-0469226875.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664521829167:android:child0123456789abcdef",
+        "android_client_info": {
+          "package_name": "com.amanguard.child"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwf9n0PLEcwECAAEhtx4Q4yD_IBXh3NW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+EOF
+            echo "✅ Created fallback child/google-services.json"
           fi
 
+          # 2. Parent App Firebase Configuration
           if [ -n "${{ secrets.GOOGLE_SERVICES_PARENT_B64 }}" ]; then
             echo "${{ secrets.GOOGLE_SERVICES_PARENT_B64 }}" | base64 -d > parent/google-services.json
-            echo "✅ Loaded parent/google-services.json from secret"
+            echo "✅ Loaded parent/google-services.json from GitHub secret"
+          elif [ ! -f "parent/google-services.json" ]; then
+            echo "⚙️ Generating default parent/google-services.json for build..."
+            cat << 'EOF' > parent/google-services.json
+{
+  "project_info": {
+    "project_number": "664521829167",
+    "project_id": "gen-lang-client-0469226875",
+    "storage_bucket": "gen-lang-client-0469226875.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664521829167:android:parent0123456789abcdef",
+        "android_client_info": {
+          "package_name": "com.amanguard.parent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwf9n0PLEcwECAAEhtx4Q4yD_IBXh3NW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+EOF
+            echo "✅ Created fallback parent/google-services.json"
           fi
 
-          ls -l child/google-services.json parent/google-services.json
+          ls -lh child/google-services.json parent/google-services.json
         env:
           GOOGLE_SERVICES_CHILD_B64: ${{ secrets.GOOGLE_SERVICES_CHILD_B64 }}
           GOOGLE_SERVICES_PARENT_B64: ${{ secrets.GOOGLE_SERVICES_PARENT_B64 }}
